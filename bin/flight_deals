@@ -1,3 +1,4 @@
 #!/usr/bin/env ruby
+require './config/environment'
 
 FlightDeals::CLI.new.call
