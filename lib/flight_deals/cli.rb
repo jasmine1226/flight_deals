@@ -6,7 +6,11 @@ class FlightDeals::CLI
   end
 
   def list_deals
-    puts "Here are the latest flight deals departing from USA:"
+    deals = FlightDeals::DealScraper.scrape_deals('https://www.secretflying.com/usa-deals/')
+    deals.each_with_index do |deal, i|
+      puts "#{i+1}. #{deal.title} - #{deal.date}"
+    end
+    deals
   end
 
   def exit
@@ -16,7 +20,10 @@ class FlightDeals::CLI
   def menu
     input = nil
     while input != "exit"
-      puts "Which deal would you like to learn about? Enter a number or type exit"
+      puts "Here are the latest flight deals departing from USA:"
+      self.list_deals
+      puts "Which deal would you like to learn about?"
+      puts "Enter a number or type exit"
       input = gets.strip.downcase
     end
   end
