@@ -1,4 +1,5 @@
 class FlightDeals::CLI
+  attr_reader :deal
 
   def call
     list_deals
@@ -6,30 +7,36 @@ class FlightDeals::CLI
   end
 
   def list_deals
-    deals = FlightDeals::DealScraper.scrape_deals('https://www.secretflying.com/usa-deals/')
-    deals.each_with_index do |deal, i|
+    puts "Here are the latest flight deals departing from USA:"
+    @deals = FlightDeals::DealScraper.scrape_deals('https://www.secretflying.com/usa-deals/')
+    @deals.each_with_index do |deal, i|
       puts "#{i+1}. #{deal.title} - #{deal.date}"
     end
-    deals
+    puts "Enter a number between 1 to #{@deals.length} to view deal details, 'deals' to view the list of deals, or 'exit'"
+    @deals
   end
 
-  def exit
+  def goodbye
     puts "Goodbye! Come back for more deals!"
   end
 
   def menu
-    input = nil
-    while input != "exit"
-      puts "Here are the latest flight deals departing from USA:"
-      self.list_deals
-      puts "Which deal would you like to learn about?"
-      puts "Enter a number or type exit"
+    input = ""
+    while input.downcase != "exit"
+      puts "What would you like to view?"
       input = gets.strip.downcase
+      if input.to_i > 0 && input.to_i < @deals.length
+        url = @deals[input.to_i-1].url
+        FlightDeals::DealScraper.scrape_deal_page(url)
+      elsif input == "deals"
+        list_deals
+      elsif input == "exit"
+        goodbye
+      else
+        puts "Sorry, I'm not sure what you're looking for..."
+        list_deals
+      end
     end
-  end
-
-  def deal_info
-
   end
 
 end
