@@ -24,4 +24,13 @@ class FlightDeals::Deal
   def self.find_by_url(url)
     deal = self.all.detect{|deal| deal.url == url}
   end
+
+  def display
+    puts "#{self.title} - #{self.post_date}"
+    puts "Depart: #{self.depart}" if self.depart
+    puts "Arrive: #{self.arrive}" if self.arrive
+    puts "Stops: #{self.stops}" if self.stops
+    puts "Airlines: #{self.airlines}" if self.airlines
+    puts "Availalbe dates: #{self.dates}" if self.dates
+  end
 end
