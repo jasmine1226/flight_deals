@@ -3,7 +3,7 @@ class FlightDeals::CLI
 
   def call
     @current_page = 1
-    @loaded_page = 10
+    @loaded_page = 3
     FlightDeals::DealScraper.scrape_deals(@loaded_page)
     list_deals(@current_page)
     menu
@@ -23,12 +23,11 @@ class FlightDeals::CLI
 
   def next_page
       @current_page += 1
-      if @current_page > 10
-        puts "No more deals to display. Come back tomorrow for new deals!"
-        @current_page = 10
-      else
-        list_deals(@current_page)
+      if @current_page > @loaded_page
+        @loaded_page += 3
+        FlightDeals::DealScraper.scrape_deals(@loaded_page)
       end
+      list_deals(@current_page)
   end
 
   def prev_page

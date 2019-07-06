@@ -1,11 +1,12 @@
 class FlightDeals::DealScraper
+  attr_accessor :loaded_page
 
   def self.load_page(url)
     Nokogiri::HTML(open(url))
   end
 
-  def self.scrape_deals(page=10)
-    for i in 1..page do
+  def self.scrape_deals(page=3)
+    for i in page-2..page do
       doc = FlightDeals::DealScraper.load_page("https://www.secretflying.com/usa-deals/page/#{i}/")
       scraped_deals = doc.css("article.category-depart-usa>div.article-content-wrapper")
       scraped_deals.each_with_index do |scraped_deal, i|
@@ -16,6 +17,7 @@ class FlightDeals::DealScraper
         FlightDeals::Deal.create(title, post_date, description, url)
       end
     end
+
     FlightDeals::Deal.all
   end
 

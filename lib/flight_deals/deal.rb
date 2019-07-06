@@ -18,7 +18,7 @@ class FlightDeals::Deal
   end
 
   def save
-    FlightDeals::Deal.all << self
+    FlightDeals::Deal.all << self if FlightDeals::Deal.all.include?(self) == false
   end
 
   def self.find_by_url(url)
