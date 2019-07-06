@@ -51,7 +51,7 @@ class FlightDeals::CLI
     while input.downcase != "exit"
       puts "What would you like to view?"
       input = gets.strip.downcase
-      if input.to_i > 0 && input.to_i < FlightDeals::Deal.all.length
+      if input.to_i > 0 && input.to_i <= FlightDeals::Deal.all.length
         url = FlightDeals::Deal.all[input.to_i-1].url
         deal = FlightDeals::DealScraper.scrape_deal_page(url)
         deal.display
