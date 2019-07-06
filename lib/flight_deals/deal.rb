@@ -1,5 +1,5 @@
 class FlightDeals::Deal
-  attr_accessor :title, :post_date, :description, :url, :depart, :arrive, :dates, :stops, :airlines
+  attr_accessor :title, :post_date, :description, :url, :depart, :arrive, :dates, :stops, :airlines, :deal_url
 
   @@all = []
 
@@ -32,5 +32,6 @@ class FlightDeals::Deal
     puts "Stops: #{self.stops}" if self.stops
     puts "Airlines: #{self.airlines}" if self.airlines
     puts "Availalbe dates: #{self.dates}" if self.dates
+    puts "Link to deal: #{self.deal_url}" if self.deal_url
   end
 end

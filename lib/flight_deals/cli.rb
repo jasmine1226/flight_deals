@@ -1,10 +1,10 @@
 class FlightDeals::CLI
-  attr_reader :deal, :current_page, :loaded_page
+  attr_reader :current_page, :loaded_page
 
   def call
     @current_page = 1
     @loaded_page = 10
-    @deals = FlightDeals::DealScraper.scrape_deals(@loaded_page)
+    FlightDeals::DealScraper.scrape_deals(@loaded_page)
     list_deals(@current_page)
     menu
   end
@@ -12,7 +12,7 @@ class FlightDeals::CLI
   def list_deals(page=1)
     puts "Here are the latest flight deals departing from USA:"
     for i in (page-1)*9..page*9-1 do
-        puts "#{i+1}. #{@deals[i].title} - #{@deals[i].post_date}"
+        puts "#{i+1}. #{FlightDeals::Deal.all[i].title} - #{FlightDeals::Deal.all[i].post_date}"
     end
     puts "Enter a number between #{(page-1)*9+1} to #{page*9} to view deal details;"
     puts "Enter 'deals' to see the deals again;"
@@ -51,8 +51,8 @@ class FlightDeals::CLI
     while input.downcase != "exit"
       puts "What would you like to view?"
       input = gets.strip.downcase
-      if input.to_i > 0 && input.to_i < @deals.length
-        url = @deals[input.to_i-1].url
+      if input.to_i > 0 && input.to_i < FlightDeals::Deal.all.length
+        url = FlightDeals::Deal.all[input.to_i-1].url
         deal = FlightDeals::DealScraper.scrape_deal_page(url)
         deal.display
       elsif input == "deals"

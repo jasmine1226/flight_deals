@@ -5,31 +5,44 @@ class FlightDeals::DealScraper
   end
 
   def self.scrape_deals(page=10)
-    deals = []
     for i in 1..page do
-      doc = FlightDeals::DealScraper.load_page("https://www.secretflying.com/usa-deals/page/#{i+1}/")
+      doc = FlightDeals::DealScraper.load_page("https://www.secretflying.com/usa-deals/page/#{i}/")
       scraped_deals = doc.css("article.category-depart-usa>div.article-content-wrapper")
       scraped_deals.each_with_index do |scraped_deal, i|
         title = scraped_deal.css("h2 a").text
         post_date = scraped_deal.css("div.entry-bottom-details span a time").text
         description = scraped_deal.css("p").text
         url = scraped_deal.css("h2 a").attribute("href").value
-        deals << FlightDeals::Deal.create(title, post_date, description, url)
+        FlightDeals::Deal.create(title, post_date, description, url)
       end
     end
-    deals
+    FlightDeals::Deal.all
   end
 
   def self.scrape_deal_page(url)
     doc = FlightDeals::DealScraper.load_page(url)
     deal = FlightDeals::Deal.find_by_url(url)
-
-    deal.depart = doc.at('strong:contains("DEPART:")').next_element.next_element.text
-    deal.arrive = doc.at('strong:contains("ARRIVE:")').next_element.next_element.text
-    deal.dates = doc.at('strong:contains("DATES:")').next_element.next_element.text
-    deal.stops = doc.css("div.snews-cat a")[0].text
-    deal.airlines = doc.at('strong:contains("AIRLINES:")').next_element.next_element.text
+    deal.deal_url = doc.at('a:contains("GO TO DEAL")').attribute("href").value
+    info = doc.css("div.entry-content>p")
+    info.each_with_index do |p, i|
+      item = p.text.split(/[\n:.]/).reject{|c| c.empty?}
+      case item[0]
+      when "DEPART"
+          deal.depart = item[1]
+      when "ARRIVE"
+          deal.arrive = item[1]
+      when "DATES"
+          deal.dates = item[1]
+      when "STOPS"
+          deal.stops = item[1]
+      when "AIRLINES"
+          deal.airlines = item[1]
+      end
+    end
     deal
   end
 
 end
+
+
+#FlightDeals::DealScraper.scrape_deal_page('https://www.secretflying.com/posts/chicago-amsterdam-netherlands-350-roundtrip/')
