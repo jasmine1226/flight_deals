@@ -1,10 +1,10 @@
 class FlightDeals::CLI
-  attr_reader :current_page, :loaded_page
+  attr_reader :current_page, :scraped_page
 
   def call
     @current_page = 1
-    @loaded_page = 3
-    FlightDeals::DealScraper.scrape_deals(@loaded_page)
+    @scraped_page = 1
+    FlightDeals::DealScraper.scrape_deals(@scraped_page)
     list_deals(@current_page)
     menu
   end
@@ -23,9 +23,9 @@ class FlightDeals::CLI
 
   def next_page
       @current_page += 1
-      if @current_page > @loaded_page
-        @loaded_page += 3
-        FlightDeals::DealScraper.scrape_deals(@loaded_page)
+      if @current_page > @scraped_page
+        @scraped_page += 1
+        FlightDeals::DealScraper.scrape_deals(@scraped_page)
       end
       list_deals(@current_page)
   end
@@ -67,5 +67,4 @@ class FlightDeals::CLI
         end
     end
   end
-
 end
