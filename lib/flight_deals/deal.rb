@@ -1,28 +1,36 @@
 class FlightDeals::Deal
   attr_accessor :title, :post_date, :description, :url, :depart, :arrive, :dates, :stops, :airlines, :deal_url
 
-  @@all = []
+  @@all = {}
 
-  def self.create(title, post_date, description, url)
-    deal = self.new
-    deal.title = title
-    deal.post_date = post_date
-    deal.description = description
-    deal.url = url
-    deal.save
-    deal
+  def initialize(deal_hash, page)
+    deal_hash.each do |k, v|
+      self.send "#{k}=", v
+    end
+    self.save(page)
+  end
+
+  def self.create_from_collection(deals_array, page)
+    self.all[page] = []
+    deals_array.each do |deal|
+      self.new(deal, page)
+    end
   end
 
   def self.all
     @@all
   end
 
-  def save
-    FlightDeals::Deal.all << self if FlightDeals::Deal.all.include?(self) == false
+  def save(page)
+    FlightDeals::Deal.all[page] << self #if FlightDeals::Deal.all.include?(self) == false
   end
 
   def self.find_by_url(url)
-    deal = self.all.detect{|deal| deal.url == url}
+    deal = {}
+    FlightDeals::Deal.all.each do |k, v|
+        deal = v.detect{|deal| deal.url == url}
+    end
+    deal
   end
 
   def display

@@ -5,17 +5,18 @@ class FlightDeals::DealScraper
     Nokogiri::HTML(open(url))
   end
 
-  def self.scrape_deals(p)
-      doc = FlightDeals::DealScraper.load_page("https://www.secretflying.com/usa-deals/page/#{p}/")
-      scraped_deals = doc.css("article.category-depart-usa>div.article-content-wrapper")
-      scraped_deals.each_with_index do |scraped_deal, i|
-        title = scraped_deal.css("h2 a").text
-        post_date = scraped_deal.css("div.entry-bottom-details span a time").text
-        description = scraped_deal.css("p").text
-        url = scraped_deal.css("h2 a").attribute("href").value
-        FlightDeals::Deal.create(title, post_date, description, url)
-      end
-    FlightDeals::Deal.all
+  def self.scrape_deals(page)
+    doc = FlightDeals::DealScraper.load_page("https://www.secretflying.com/usa-deals/page/#{page}/")
+    deals = []
+    doc.css("article.category-depart-usa>div.article-content-wrapper").each do |scraped_deal|
+      deals << {
+      title: scraped_deal.css("h2 a").text,
+      post_date: scraped_deal.css("div.entry-bottom-details span a time").text,
+      description: scraped_deal.css("p").text,
+      url: scraped_deal.css("h2 a").attribute("href").value
+      }
+    end
+    deals
   end
 
   def self.scrape_deal_page(url)
