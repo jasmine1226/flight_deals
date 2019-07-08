@@ -58,7 +58,7 @@ class FlightDeals::CLI
       input = gets.strip.downcase
       if input.to_i > 0 && input.to_i <= FlightDeals::Deal.all[@current_page].length
         url = FlightDeals::Deal.all[@current_page][input.to_i-1].url
-        deal = FlightDeals::DealScraper.scrape_deal_page(url)
+        deal = FlightDeals::DealScraper.load_or_scrape_deal(url)
         deal.display
       elsif input == "menu"
         list_deals(@current_page)
@@ -70,7 +70,7 @@ class FlightDeals::CLI
         goodbye
       else
         puts "Sorry, I'm not sure what you're looking for..."
-        end
+      end
     end
   end
 end

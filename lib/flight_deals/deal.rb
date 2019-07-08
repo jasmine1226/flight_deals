@@ -1,5 +1,5 @@
 class FlightDeals::Deal
-  attr_accessor :title, :post_date, :description, :url, :depart, :arrive, :dates, :stops, :airlines, :deal_url
+  attr_accessor :scraped,:title, :post_date, :description, :url, :depart, :arrive, :dates, :stops, :airlines, :deal_url
 
   @@all = {}
 
@@ -7,6 +7,7 @@ class FlightDeals::Deal
     deal_hash.each do |k, v|
       self.send "#{k}=", v
     end
+    self.scraped = false
     self.save(page)
   end
 
@@ -22,13 +23,16 @@ class FlightDeals::Deal
   end
 
   def save(page)
-    FlightDeals::Deal.all[page] << self #if FlightDeals::Deal.all.include?(self) == false
+    FlightDeals::Deal.all[page] << self if FlightDeals::Deal.all[page].include?(self) == false
   end
 
   def self.find_by_url(url)
     deal = {}
-    FlightDeals::Deal.all.each do |k, v|
-        deal = v.detect{|deal| deal.url == url}
+    FlightDeals::Deal.all.each do |page, deals|
+        deals.each do |d|
+          deal = d if d.url == url
+        #deal = deals.detect{|deal| deal.url == url}
+        end
     end
     deal
   end

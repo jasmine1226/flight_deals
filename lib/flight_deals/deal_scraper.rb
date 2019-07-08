@@ -19,9 +19,8 @@ class FlightDeals::DealScraper
     deals
   end
 
-  def self.scrape_deal_page(url)
-    doc = FlightDeals::DealScraper.load_page(url)
-    deal = FlightDeals::Deal.find_by_url(url)
+  def self.scrape_deal_page(deal)
+    doc = FlightDeals::DealScraper.load_page(deal.url)
     deal.deal_url = doc.at('a:contains("GO TO DEAL")').attribute("href").value
     info = doc.css("div.entry-content>p")
     info.each_with_index do |p, i|
@@ -39,7 +38,13 @@ class FlightDeals::DealScraper
           deal.airlines = item[1]
       end
     end
+    deal.scraped = true
     deal
   end
 
+  def self.load_or_scrape_deal(url)
+    deal = FlightDeals::Deal.find_by_url(url)
+    deal = scrape_deal_page(deal) if deal.scraped == false
+    deal
+  end
 end
