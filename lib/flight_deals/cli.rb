@@ -15,16 +15,26 @@ class FlightDeals::CLI
   end
 
   def list_deals(page)
-    puts "Here are the latest flight deals departing from USA:"
+    puts "Here are the latest flight deals departing from USA:".colorize(:blue)
     puts "<page #{page}>"
     for i in 1..FlightDeals::Deal.all[page].length do
         puts "#{i}. #{FlightDeals::Deal.all[page][i-1].title} - #{FlightDeals::Deal.all[page][i-1].post_date}"
     end
-    puts "Enter a number between 1 to #{FlightDeals::Deal.all[page].length} to view deal details;"
-    puts "Enter 'menu' to see the deals again;"
-    puts "Enter 'next' to the next page;"
-    puts "Enter 'back' to the previous page;"
-    puts "Or enter 'exit'"
+    puts "Enter a number between 1 to #{FlightDeals::Deal.all[page].length} to view deal details;".colorize(:blue)
+    puts "Enter" + " 'menu'".colorize(:green) + " to see the deals again;"
+    puts "Enter" + " 'next'".colorize(:green) + " to the next page;"
+    puts "Enter" + " 'back'".colorize(:green) + " to the previous page;"
+    puts "Or enter" + " 'exit'".colorize(:red)
+  end
+
+  def display_deal(deal)
+    puts "#{deal.title} - #{deal.post_date}".colorize(:blue)
+    puts "Depart:".colorize(:light_blue) + " #{deal.depart}" if deal.depart
+    puts "Arrive:".colorize(:light_blue) + " #{deal.arrive}" if deal.arrive
+    puts "Stops:".colorize(:light_blue) + " #{deal.stops}" if deal.stops
+    puts "Airlines:".colorize(:light_blue) + " #{deal.airlines}" if deal.airlines
+    puts "Availalbe dates:".colorize(:light_blue) + " #{deal.dates}" if deal.dates
+    puts "Link to deal:".colorize(:light_blue) + " #{deal.deal_url}" if deal.deal_url
   end
 
   def next_page
@@ -59,7 +69,7 @@ class FlightDeals::CLI
       if input.to_i > 0 && input.to_i <= FlightDeals::Deal.all[@current_page].length
         url = FlightDeals::Deal.all[@current_page][input.to_i-1].url
         deal = FlightDeals::DealScraper.load_or_scrape_deal(url)
-        deal.display
+        display_deal(deal)
       elsif input == "menu"
         list_deals(@current_page)
       elsif input == "next"

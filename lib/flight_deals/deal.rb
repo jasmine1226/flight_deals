@@ -39,11 +39,11 @@ class FlightDeals::Deal
 
   def display
     puts "#{self.title} - #{self.post_date}"
-    puts "Depart: #{self.depart}" if self.depart
-    puts "Arrive: #{self.arrive}" if self.arrive
-    puts "Stops: #{self.stops}" if self.stops
-    puts "Airlines: #{self.airlines}" if self.airlines
-    puts "Availalbe dates: #{self.dates}" if self.dates
-    puts "Link to deal: #{self.deal_url}" if self.deal_url
+    puts "Depart:".colorize(:light_blue) + " #{self.depart}" if self.depart
+    puts "Arrive:".colorize(:light_blue) + " #{self.arrive}" if self.arrive
+    puts "Stops:".colorize(:light_blue) + " #{self.stops}" if self.stops
+    puts "Airlines:".colorize(:light_blue) + " #{self.airlines}" if self.airlines
+    puts "Availalbe dates:".colorize(:light_blue) + " #{self.dates}" if self.dates
+    puts "Link to deal:".colorize(:light_blue) + " #{self.deal_url}" if self.deal_url
   end
 end

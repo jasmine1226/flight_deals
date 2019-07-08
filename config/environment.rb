@@ -1,5 +1,6 @@
 require 'nokogiri'
 require 'open-uri'
+require 'colorize'
 
 require_relative '../lib/flight_deals/version'
 require_relative '../lib/flight_deals/deal'
