@@ -70,17 +70,24 @@ class FlightDeals::CLI
         url = FlightDeals::Deal.all[@current_page][input.to_i-1].url
         deal = FlightDeals::DealScraper.load_or_scrape_deal(url)
         display_deal(deal)
-      elsif input == "menu"
-        list_deals(@current_page)
-      elsif input == "next"
-        next_page
-      elsif input == "back"
-        prev_page
-      elsif input == "exit"
-        goodbye
       else
-        puts "Sorry, I'm not sure what you're looking for..."
+        parse_input(input)
       end
+    end
+  end
+
+  def parse_input(input)
+    case input
+    when "menu"
+      list_deals(@current_page)
+    when "next"
+      next_page
+    when "back"
+      prev_page
+    when "exit"
+      goodbye
+    else
+      puts "Sorry, I'm not sure what you're looking for..."
     end
   end
 end
