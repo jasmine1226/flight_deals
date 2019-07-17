@@ -1,21 +1,22 @@
 class FlightDeals::CLI
-  attr_reader :current_page, :scraped_page
+  attr_reader :current_page, :scraped_page, :region
 
   def call
     @current_page = 1
     @scraped_page = 1
-    generate_deals(@scraped_page)
+    @region = self.select_region
+    generate_deals(@scraped_page, @region)
     list_deals(@current_page)
     menu
   end
 
-  def generate_deals(page)
-    deals_array = FlightDeals::DealScraper.scrape_deals(page)
+  def generate_deals(page, region)
+    deals_array = FlightDeals::DealScraper.scrape_deals(page, region)
     FlightDeals::Deal.create_from_collection(deals_array, page)
   end
 
   def list_deals(page)
-    puts "Here are the latest flight deals departing from USA:".colorize(:blue)
+    puts "Here are the latest flight deals:".colorize(:blue)
     puts "<page #{page}>"
     for i in 1..FlightDeals::Deal.all[page].length do
         puts "#{i}. #{FlightDeals::Deal.all[page][i-1].title} - #{FlightDeals::Deal.all[page][i-1].post_date}"
@@ -24,6 +25,7 @@ class FlightDeals::CLI
     puts "Enter" + " 'menu'".colorize(:green) + " to see the deals again;"
     puts "Enter" + " 'next'".colorize(:green) + " to the next page;"
     puts "Enter" + " 'back'".colorize(:green) + " to the previous page;"
+    puts "Enter" + " 'region'".colorize(:green) + " to see deals for a differnt region;"
     puts "Or enter" + " 'exit'".colorize(:red)
   end
 
@@ -41,7 +43,7 @@ class FlightDeals::CLI
       @current_page += 1
       if @current_page > @scraped_page
         @scraped_page += 1
-        generate_deals(@scraped_page)
+        generate_deals(@scraped_page, @region)
       end
       list_deals(@current_page)
   end
@@ -84,10 +86,51 @@ class FlightDeals::CLI
       next_page
     when "back"
       prev_page
+    when "region"
+      call
     when "exit"
       goodbye
     else
       puts "Sorry, I'm not sure what you're looking for..."
     end
+  end
+
+  def select_region
+    puts "Where are you departing from?"
+    puts "1. USA"
+    puts "2. Canada"
+    puts "3. Central America & Caribbean"
+    puts "4. South America"
+    puts "5. Europe"
+    puts "6. Middle East & North Africa"
+    puts "7. Africa"
+    puts "8. Central and South Asia"
+    puts "9. East Asia"
+    puts "10. Oceania"
+    input = gets.strip
+    @region = ""
+    case input
+    when "1"
+      @region = "usa"
+    when "2"
+      @region = "canada"
+    when "3"
+      @region = "central-america-caribbean"
+    when "4"
+      @region = "south-america"
+    when "5"
+      @region = "euro"
+    when "6"
+      @region = "mena"
+    when "7"
+      @region = "africa"
+    when "8"
+      @region = "central-south-asia"
+    when "9"
+      @region = "east-asia"
+    when "10"
+      @region = "oceania"
+    end
+    @region
   end
 end
