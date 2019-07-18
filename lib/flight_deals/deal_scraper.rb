@@ -1,17 +1,32 @@
 class FlightDeals::DealScraper
-  attr_accessor :loaded_page, :region
+  attr_accessor :doc
 
   def self.load_page(page, region)
     base_url = "https://www.secretflying.com/"
-    @region = region
-    url = base_url + @region + "-deals/page/" + page.to_s + "/"
+    url = base_url + region + "-deals/page/" + page.to_s + "/"
     Nokogiri::HTML(open(url))
   end
 
   def self.scrape_deals(page, region)
     doc = FlightDeals::DealScraper.load_page(page, region)
     deals = []
-    doc.css("article.category-depart-#{region}>div.article-content-wrapper").each do |scraped_deal|
+    case region
+    when "euro"
+      euro_regions = ["uk", "mainland-europe", "uk-ireland"]
+      euro_regions.each do |region|
+        css = "article.category-depart-#{region}>div.article-content-wrapper"
+        deals += FlightDeals::DealScraper.scrape_by_css(doc, css)
+      end
+    else
+      css = "article.category-depart-#{region}>div.article-content-wrapper"
+      deals = FlightDeals::DealScraper.scrape_by_css(doc, css)
+    end
+    deals
+  end
+
+  def self.scrape_by_css(doc, css)
+    deals = []
+    doc.css(css).each do |scraped_deal|
       deals << {
       title: scraped_deal.css("h2 a").text,
       post_date: scraped_deal.css("div.entry-bottom-details span a time").text,
