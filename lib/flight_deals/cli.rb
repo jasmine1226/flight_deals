@@ -4,10 +4,17 @@ class FlightDeals::CLI
   def call
     @current_page = 1
     @scraped_page = 1
-    @region = self.select_region
-    generate_deals(@scraped_page, @region)
-    list_deals(@current_page)
+    load_regions
     menu
+  end
+
+  def load_regions
+    regions = []
+    region_names = FlightDeals::DealScraper.scrape_regions
+  #  region_names.each do |name|
+  #    regions << FlightDeals::Region.new(name)
+  #  end
+    regions
   end
 
   def generate_deals(page, region)
@@ -22,7 +29,6 @@ class FlightDeals::CLI
         puts "#{i}. #{FlightDeals::Deal.all[page][i-1].title} - #{FlightDeals::Deal.all[page][i-1].post_date}"
     end
     puts "Enter a number between 1 to #{FlightDeals::Deal.all[page].length} to view deal details;".colorize(:blue)
-    puts "Enter" + " 'menu'".colorize(:green) + " to see the deals again;"
     puts "Enter" + " 'next'".colorize(:green) + " to the next page;"
     puts "Enter" + " 'back'".colorize(:green) + " to the previous page;"
     puts "Enter" + " 'region'".colorize(:green) + " to see deals for a differnt region;"
@@ -63,6 +69,9 @@ class FlightDeals::CLI
   end
 
   def menu
+    @region = self.get_region
+    generate_deals(@scraped_page, @region)
+    list_deals(@current_page)
     input = ""
     deal = ""
     while input.downcase != "exit"
@@ -80,14 +89,15 @@ class FlightDeals::CLI
 
   def parse_input(input)
     case input
-    when "menu"
-      list_deals(@current_page)
     when "next"
       next_page
     when "back"
       prev_page
     when "region"
-      call
+      @current_page = 1
+      @region = self.get_region
+      generate_deals(@scraped_page, @region)
+      list_deals(@current_page)
     when "exit"
       goodbye
     else
@@ -95,7 +105,7 @@ class FlightDeals::CLI
     end
   end
 
-  def select_region
+  def display_regions
     puts "Where are you departing from?"
     puts "1. USA"
     puts "2. Canada"
@@ -107,6 +117,10 @@ class FlightDeals::CLI
     puts "8. Central and South Asia"
     puts "9. East Asia"
     puts "10. Oceania"
+  end
+
+  def get_region
+    display_regions
     input = gets.strip
     @region = ""
     case input
@@ -130,6 +144,8 @@ class FlightDeals::CLI
       @region = "east-asia"
     when "10"
       @region = "oceania"
+    when "exit"
+      puts "choose a region before you exit"
     end
     @region
   end

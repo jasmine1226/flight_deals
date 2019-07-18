@@ -1,5 +1,4 @@
 class FlightDeals::DealScraper
-  attr_accessor :doc
 
   def self.load_page(page, region)
     base_url = "https://www.secretflying.com/"
@@ -22,6 +21,13 @@ class FlightDeals::DealScraper
       deals = FlightDeals::DealScraper.scrape_by_css(doc, css)
     end
     deals
+  end
+
+  #scrape name of regions from homepage
+  def self.scrape_regions
+    doc = Nokogiri::HTML(open("https://www.secretflying.com/"))
+    region_names = doc.css("div.regionLableText").text
+    region_names
   end
 
   def self.scrape_by_css(doc, css)
